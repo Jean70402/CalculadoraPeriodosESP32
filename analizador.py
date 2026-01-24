@@ -1,14 +1,16 @@
-import pandas as pd
-import numpy as np
+import os
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from matplotlib.widgets import Button, RadioButtons, SpanSelector
 from scipy.fft import fft, fftfreq
-import os
+
 
 def obtener_analisis(tiempos, valores):
     v_arr = np.array(valores)
     v_centrado = v_arr - np.mean(v_arr)
-    t_arr = (np.array(tiempos) - tiempos[0]) / 1000.0 # Segundos
+    t_arr = (np.array(tiempos) - tiempos[0]) / 1000.0  # Segundos
 
     # 1. Periodo por cruce por cero
     indices = np.where(np.diff(np.sign(v_centrado)) > 0)[0]
@@ -18,13 +20,14 @@ def obtener_analisis(tiempos, valores):
 
     # 2. FFT (Transformada de Fourier)
     n = len(v_centrado)
-    d = np.mean(np.diff(t_arr)) # Intervalo de muestreo
+    d = np.mean(np.diff(t_arr))  # Intervalo de muestreo
     yf = fft(v_centrado)
-    xf = fftfreq(n, d)[:n//2]
-    amplitud = 2.0/n * np.abs(yf[0:n//2])
-    f_dominante = xf[np.argmax(amplitud[1:]) + 1] # Ignorar frecuencia 0
+    xf = fftfreq(n, d)[:n // 2]
+    amplitud = 2.0 / n * np.abs(yf[0:n // 2])
+    f_dominante = xf[np.argmax(amplitud[1:]) + 1]  # Ignorar frecuencia 0
 
     return t_medio, f_dominante, xf, amplitud
+
 
 class AnalizadorIndependiente:
     def __init__(self):
@@ -58,7 +61,7 @@ class AnalizadorIndependiente:
         self.ax_list.set_title("Archivos Excel", fontsize=9)
         archivos = [f for f in os.listdir('.') if f.endswith('.xlsx')]
         # Recorte de nombres para evitar desbordamiento
-        nombres_vista = [ (f[:22] + "..") if len(f) > 24 else f for f in archivos ]
+        nombres_vista = [(f[:22] + "..") if len(f) > 24 else f for f in archivos]
 
         if not archivos:
             nombres_vista = ["Sin archivos"]
@@ -77,9 +80,9 @@ class AnalizadorIndependiente:
         self.ax_signal.clear()
         t = (self.df['ms'] - self.df['ms'].iloc[0]) / 1000.0
         # Sensibilidad 16384 para BMI160 en 2G
-        self.ax_signal.plot(t, self.df['ax']/16384.0, 'r', label='AX', alpha=0.5)
-        self.ax_signal.plot(t, self.df['ay']/16384.0, 'g', label='AY', alpha=0.5)
-        self.ax_signal.plot(t, self.df['az']/16384.0, 'b', label='AZ', alpha=0.5)
+        self.ax_signal.plot(t, self.df['ax'] / 16384.0, 'r', label='AX', alpha=0.5)
+        self.ax_signal.plot(t, self.df['ay'] / 16384.0, 'g', label='AY', alpha=0.5)
+        self.ax_signal.plot(t, self.df['az'] / 16384.0, 'b', label='AZ', alpha=0.5)
         self.ax_signal.legend(loc='upper right', fontsize=8)
         self.ax_signal.grid(True, alpha=0.2)
         plt.draw()
@@ -96,14 +99,17 @@ class AnalizadorIndependiente:
 
         colores = {'ax': 'red', 'ay': 'green', 'az': 'blue'}
         for col in ['ax', 'ay', 'az']:
-            t_med, f_dom, xf, amp = obtener_analisis(sel['ms'].values, sel[col]/16384.0)
+            t_med, f_dom, xf, amp = obtener_analisis(sel['ms'].values, sel[col] / 16384.0)
             self.ax_fft.plot(xf, amp, color=colores[col], label=f"FFT {col.upper()}", alpha=0.8)
             res_txt += f"{col.upper()}: T={t_med:.3f}s | f(FFT)={f_dom:.2f}Hz   "
 
-        self.ax_fft.set_xlabel("Frecuencia (Hz)"); self.ax_fft.set_ylabel("Amplitud")
-        self.ax_fft.grid(True, alpha=0.2); self.ax_fft.legend(fontsize=8)
+        self.ax_fft.set_xlabel("Frecuencia (Hz)");
+        self.ax_fft.set_ylabel("Amplitud")
+        self.ax_fft.grid(True, alpha=0.2);
+        self.ax_fft.legend(fontsize=8)
         self.txt_res.set_text(res_txt)
         plt.draw()
+
 
 if __name__ == "__main__":
     app = AnalizadorIndependiente()
@@ -111,6 +117,9 @@ if __name__ == "__main__":
     # Maximizar la ventana del analizador al abrir
     manager = plt.get_current_fig_manager()
     try:
+        manager.window.state('zoomed')
+        manager.window.iconbitmap("icono.ico")
+        manager.window.title("Análisis de vibraciones- Grupo 2 EPN")
         manager.window.state('zoomed')
     except:
         pass
