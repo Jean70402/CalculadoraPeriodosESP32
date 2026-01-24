@@ -176,26 +176,27 @@ threading.Thread(target=lectura_serial, daemon=True).start()
 ani = FuncAnimation(fig, update, interval=50, blit=False, cache_frame_data=False)
 
 manager = plt.get_current_fig_manager()
-
-# 2. Intentar maximizar según el backend (Windows/Tkinter es el más común)
-try:
-
-    manager.window.iconbitmap("icono.ico")
-    manager.window.title("Acelerograma - Grupo 2 EPN")
-    manager.window.state('zoomed')
-
-except AttributeError:
-    # Si usas otros backends como Qt o WX
+if __name__ == "__main__":
+    # 2. Intentar maximizar según el backend (Windows/Tkinter es el más común)
     try:
-        manager.frame.Maximize(True)
-    except:
-        try:
-            manager.window.showMaximized()
-        except:
-            pass
 
-refrescar_puertos()
-threading.Thread(target=lectura_serial, daemon=True).start()
-ani = FuncAnimation(fig, update, interval=50, blit=False, cache_frame_data=False)
-fig.canvas.manager.set_window_title('Acelerograma - Grupo 2 EPN')
-plt.show()
+        manager.window.iconbitmap("icono.ico")
+        manager.window.title("Acelerograma - Grupo 2 EPN")
+        manager.window.state('zoomed')
+
+    except AttributeError:
+        # Si usas otros backends como Qt o WX
+        try:
+            manager.frame.Maximize(True)
+        except:
+            try:
+                manager.window.showMaximized()
+            except:
+                pass
+
+    refrescar_puertos()
+    threading.Thread(target=lectura_serial, daemon=True).start()
+    ani = FuncAnimation(fig, update, interval=50, blit=False, cache_frame_data=False)
+    fig.canvas.manager.set_window_title('Acelerograma - Grupo 2 EPN')
+    plt.show()
+
