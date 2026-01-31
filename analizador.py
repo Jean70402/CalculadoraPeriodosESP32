@@ -2,6 +2,7 @@ import os
 import sys
 import ctypes
 import matplotlib.pyplot as plt
+import mplcursors
 import numpy as np
 import pandas as pd
 from matplotlib.widgets import Button, RadioButtons, SpanSelector
@@ -74,7 +75,10 @@ class AnalizadorIndependiente:
             self.ax_fft.plot(xf, amp, color=cl, label=f"FFT {c.upper()}", alpha=0.8)
             r_t += f"{c.upper()}: T={tm:.3f}s | f={fd:.2f}Hz  "
         self.ax_fft.legend(); self.ax_fft.grid(True, alpha=0.2); self.txt_res.set_text(r_t); plt.draw()
-
+        # Esto habilitará etiquetas interactivas en el gráfico de FFT
+        mplcursors.cursor(self.ax_fft, hover=False).connect(
+            "add", lambda sel: sel.annotation.set_text(f"f: {sel.target[0]:.2f}Hz\nAmp: {sel.target[1]:.4f}")
+        )
 if __name__ == "__main__":
     import ctypes
     try: ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('epn.ingenieria.acelerograma.v1')
