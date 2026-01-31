@@ -33,7 +33,7 @@ Para ejecutar el código fuente, asegúrese de tener instalado Python 3.10 o sup
 ```bash
 pip install pyserial pandas numpy matplotlib scipy openpyxl
 ```
-O instale las librerias en `requierements.txt`
+O instale las librerias en `requirements.txt`
 
 ### 2. Uso de la Aplicación
 1. **Conexión:** Conecte el dispositivo ESP32-C3 mediante USB.
